@@ -89,7 +89,7 @@ class TitaFlatCfg( LeggedRobotCfg ):
             heading = [-3.14, 3.14]
 
     class asset( LeggedRobotCfg.asset ):
-        file = '{ROOT_DIR}/resources/tita/urdf/robot.urdf'
+        file = '{ROOT_DIR}/ddt_ros2_control/urdfs/tita_description/urdf/robot.urdf'
         foot_name = "leg_4"
         name = "tita"
         penalize_contacts_on = ["leg_3"]

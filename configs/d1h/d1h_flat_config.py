@@ -444,7 +444,7 @@ class D1HFlatCfg( LeggedRobotCfg ):
             heading = [-3.14, 3.14]
 
     class asset( LeggedRobotCfg.asset ):
-        file = '{ROOT_DIR}/resources/d1h/urdf/robot.urdf'
+        file = '{ROOT_DIR}/ddt_ros2_control/urdfs/d1h_description/urdf/robot.urdf'
         foot_name = "foot"
         name = "d1h"
         penalize_contacts_on = ["thigh", "calf"]

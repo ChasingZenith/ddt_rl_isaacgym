@@ -8,6 +8,26 @@
    - `cd isaacgym/python && pip install -e .`
    - Try running an example `cd examples && python 1080_balls_of_solitude.py`
    - For troubleshooting check docs `isaacgym/docs/index.html`)
+4. Clone robot description assets (into the repo root):
+    ```bash
+    git clone https://github.com/DDTRobot/ddt_ros2_control/
+    ```
+    After cloning, the repo should look like:
+    ```
+    ddt_rl_isaacgym/
+    ├── algorithm/
+    ├── configs/
+    ├── ddt_ros2_control/   ← cloned here
+    ├── modules/
+    ├── resources/
+    ├── runner/
+    ├── scripts/
+    └── utils/
+    ```
+5. Fix URDF mesh paths (replaces `package://` URIs with absolute paths so Isaac Gym can locate the mesh files):
+    ```bash
+    python scripts/fix_urdf_package_paths.py
+    ```
 
 ### CODE STRUCTURE ###
 1. Each environment is defined in an config file (`$ROBOT_$TERRAIN_config.py`) in `configs`, such as `d1_flat_config.py`. Task `d1_flat_config.py` as an example. The config file contains: 
