@@ -52,6 +52,10 @@ def play(args):
     # env_cfg.domain_rand.randomize_kpkd = False
     # prepare environment
     env, _ = task_registry.make_env(name=args.task, args=args, env_cfg=env_cfg)
+    # Use the full pitch randomization range during playback.
+    if hasattr(env.cfg.init_state, "pitch_curriculum_samples"):
+        env.collected_samples = env.cfg.init_state.pitch_curriculum_samples
+    env.reset()
     obs = env.get_observations()
     # load policy partial_checkpoint_load
     # train_cfg.runner.resume = True

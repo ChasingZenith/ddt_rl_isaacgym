@@ -30,8 +30,12 @@ class D1Flat(LeggedRobot):
             self.root_states[env_ids] = self.base_init_state
             self.root_states[env_ids, :3] += self.env_origins[env_ids]
         # base rotation
-        random_roll = torch_rand_float(-np.pi, np.pi, (len(env_ids),1), device=self.device).squeeze(1)
-        random_pitch = torch_rand_float(-np.pi, np.pi, (len(env_ids),1), device=self.device).squeeze(1)
+        # Widen the pitch range based on collected interation samples.
+        collected_samples = getattr(self, "collected_samples", 0)
+        pitch_roll_progress = min(max(collected_samples / self.cfg.init_state.pitch_curriculum_samples, 0.0), 1.0)
+        pitch_roll_range = 0.2 * np.pi * pitch_roll_progress
+        random_roll = torch_rand_float(-pitch_roll_range, pitch_roll_range, (len(env_ids), 1), device=self.device).squeeze(1)
+        random_pitch = torch_rand_float(-pitch_roll_range, pitch_roll_range, (len(env_ids), 1), device=self.device).squeeze(1)
         random_yaw = torch_rand_float(-np.pi, np.pi, (len(env_ids),1), device=self.device).squeeze(1)
         self.root_states[env_ids, 3:7] = quat_from_euler_xyz(random_roll, random_pitch, random_yaw)
         # base velocities
@@ -277,6 +281,7 @@ class D1FlatCfg( LeggedRobotCfg ):
         num_observations = n_proprio + n_scan + history_len*n_proprio + n_priv_latent
         num_actions = 16
     class init_state( LeggedRobotCfg.init_state ):
+        pitch_curriculum_samples = 4096 * 24 * 500  # Fixed reference budget; independent of runtime num_envs.
         pos = [0.0, 0.0, 0.60] # x,y,z [m]
         default_joint_angles = { # = target angles [rad] when action = 0.0
             'FL_hip_joint': 0.1,   # [rad]

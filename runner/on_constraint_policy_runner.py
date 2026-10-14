@@ -73,6 +73,7 @@ class OnConstraintPolicyRunner:
         self.tot_timesteps = 0
         self.tot_time = 0
         self.current_learning_iteration = 0
+        self.env.collected_samples = 0
 
         self.env.reset()
 
@@ -130,6 +131,7 @@ class OnConstraintPolicyRunner:
                    
                     actions = self.alg.act(obs, critic_obs, infos)
                     obs, privileged_obs, rewards,costs,dones, infos = self.env.step(actions)  # obs has changed to next_obs !! if done obs has been reset
+                    self.env.collected_samples += self.env.num_envs
                     critic_obs = privileged_obs if privileged_obs is not None else obs
                     obs, critic_obs,rewards,costs,dones = obs.to(self.device), critic_obs.to(self.device), rewards.to(self.device),costs.to(self.device),dones.to(self.device)
                     self.alg.process_env_step(rewards,costs,dones, infos)
@@ -255,6 +257,7 @@ class OnConstraintPolicyRunner:
             'model_state_dict': self.alg.actor_critic.state_dict(),
             'optimizer_state_dict': self.alg.optimizer.state_dict(),
             'iter': self.current_learning_iteration,
+            'collected_samples': self.env.collected_samples,
             'infos': infos,
             }
         torch.save(state_dict, path)
@@ -268,6 +271,8 @@ class OnConstraintPolicyRunner:
         if load_optimizer:
             self.alg.optimizer.load_state_dict(loaded_dict['optimizer_state_dict'])
         # self.current_learning_iteration = loaded_dict['iter']
+        # Older checkpoints do not record the sample count; restart the curriculum for those.
+        self.env.collected_samples = loaded_dict.get('collected_samples', 0)
         print("*" * 80)
         return loaded_dict['infos']
 
